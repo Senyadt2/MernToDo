@@ -9,11 +9,11 @@ import MenuIcon from "@mui/icons-material/Menu";
 export default function NavBar() {
   return (
     <>
-      <div className="w-full bg-slate-500 h-16 flex justify-between px-5 items-center py-10">
-        <div className="font-medium text-2xl">To Do App</div>
-        <div className="flex justify-center flex-wrap items-center gap-5 ">
-          <div className="font-medium text-xl">About Me</div>
-          <div className="text-xl">Log-Out</div>
+      <div className="flex items-center justify-between w-full h-16 px-3 md:px-5 md:py-10 bg-slate-500">
+        <div className="text-xl font-medium md:text-2xl">To Do App</div>
+        <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5 ">
+          <div className="text-base font-medium md:text-xl">About Me</div>
+          <div className="text-base font-medium md:text-xl">Log-Out</div>
         </div>
       </div>
     </>

@@ -35,7 +35,7 @@ const AddTask = () => {
   //   console.log(task);
   return (
     <>
-      <div className="w-full p-6 h-5 bg-slate-600 flex justify-between items-center">
+      <div className="flex items-center justify-between w-full h-5 p-6 rounded bg-slate-600">
         <div> </div>
         <div>
           <button onClick={handleOpen} type="button" class="button">
@@ -61,8 +61,8 @@ const AddTask = () => {
         </div>
       </div>
       {isopen && (
-        <div className="fixed rounded-lg w-[auto] h-[100px] px-10 py-20 top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 bg-slate-500  border z-50">
-          <div className="flex justify-center items-center w-full h-full gap-6">
+        <div className="fixed rounded-lg w-[90%] md:w-[auto] h-[100px] px-10 py-20 top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 bg-slate-500  border z-50">
+          <div className="flex items-center justify-center w-full h-full gap-6">
             <div className="form">
               <input
                 className="input"
@@ -74,12 +74,24 @@ const AddTask = () => {
               />
               <span className="input-border"></span>
             </div>
-            <Button size="small" onClick={handleSubmit} variant="contained">
-              Add
-            </Button>
-            <Button size="small" onClick={handleClose} variant="contained">
-              Close
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="small"
+                className="w-10 h-5 md:w-auto md:h-auto"
+                onClick={handleSubmit}
+                variant="contained"
+              >
+                Add
+              </Button>
+              <Button
+                className="w-10 h-5 md:w-auto md:h-auto"
+                size="small"
+                onClick={handleClose}
+                variant="contained"
+              >
+                Close
+              </Button>
+            </div>
           </div>
         </div>
       )}

@@ -190,7 +190,7 @@ state. */
                         </div>
                       </td>
                       <td
-                        className={`text-center ${
+                        className={`text-center text-lg ${
                           item.done === true ? "line-through" : ""
                         }`}
                       >
@@ -219,7 +219,7 @@ state. */
           <thead>
             <tr>
               {/* <th scope="col">#</th> */}
-              <th scope="col" className="w-[17%]">
+              <th scope="col" className="w-[17%] text-center">
                 #
               </th>
 
@@ -255,7 +255,7 @@ state. */
                         /> */}
                   </td>
                   <td
-                    className={`text-center ${
+                    className={`text-center  text-lg ${
                       item.done === true ? "line-through" : ""
                     }`}
                   >
@@ -283,7 +283,7 @@ state. */
           <thead>
             <tr>
               {/* <th scope="col">#</th> */}
-              <th scope="col" className="w-[17%]">
+              <th scope="col" className="w-[17%] text-center">
                 #
               </th>
 
@@ -312,14 +312,9 @@ state. */
                         <span className="checkmark"></span>
                       </label>
                     </div>
-                    {/* <input
-                          type="checkbox"
-                          checked={item.done === true ? true : false}
-                          onClick={(e) => handleCheck(item._id, e)}
-                        /> */}
                   </td>
                   <td
-                    className={`text-center ${
+                    className={`text-center  text-lg ${
                       item.done === true ? "line-through" : ""
                     }`}
                   >
@@ -341,7 +336,7 @@ state. */
         </table>
       </CustomTabPanel>
       {open && (
-        <div className="fixed rounded-lg w-[auto] h-[100px] px-10 py-20 top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 bg-slate-500  border z-50">
+        <div className="fixed rounded-lg w-[90%] md:w-[auto] h-[100px] px-10 py-20 top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 bg-slate-500  border z-50">
           <div className="flex items-center justify-center w-full h-full gap-6">
             <div className="form">
               <input
@@ -354,12 +349,24 @@ state. */
               />
               <span className="input-border"></span>
             </div>
-            <Button size="small" onClick={handleSubmit} variant="contained">
-              Edited
-            </Button>
-            <Button size="small" onClick={handleClose} variant="contained">
-              Close
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="small"
+                className="w-10 h-5 md:w-auto md:h-auto"
+                onClick={handleSubmit}
+                variant="contained"
+              >
+                Edited
+              </Button>
+              <Button
+                size="small"
+                className="w-10 h-5 md:w-auto md:h-auto"
+                onClick={handleClose}
+                variant="contained"
+              >
+                Close
+              </Button>
+            </div>
           </div>
         </div>
       )}
