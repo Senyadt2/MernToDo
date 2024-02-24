@@ -11,6 +11,8 @@ import { MdOutlineDelete } from "react-icons/md";
 import ResetContext from "../GlobalContext/ResetContext";
 import Button from "@mui/material/Button";
 import CheckBox from "./CheckBox";
+import SkeletonLayout from "./SkeletonLayout";
+import "./CheckBoxCss.css";
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -48,7 +50,7 @@ export default function BasicTabs() {
   const { restart, setRestart } = React.useContext(ResetContext);
 
   const { fetchToDos, deleteToDo, updateToDo, completeTask } = ApiCalls();
-
+  const [loading, setLoading] = React.useState(true);
   const [value, setValue] = React.useState(0);
   const [todos, setTodos] = React.useState([]);
 
@@ -59,30 +61,45 @@ export default function BasicTabs() {
   React.useEffect(() => {
     async function fetchdata() {
       const response = await fetchToDos();
-      console.log(response);
+
       setTodos(response);
+      setLoading(false);
     }
     fetchdata();
   }, [restart]);
 
+  const [completedTodos, setCompletedTodos] = React.useState([]);
+  /* The code snippet you provided is utilizing the `React.useCallback` hook to create a memoized
+callback function named `filterCompletedTodos`. This function filters the `todos` array to find
+items where the `done` property is `true`, and then sets the filtered data in the `completedTodos`
+state. */
+  const filterCompletedTodos = React.useCallback(() => {
+    const completedData = todos.filter((item) => item.done === true);
+    setCompletedTodos(completedData);
+  }, [todos]);
+  React.useEffect(() => {
+    filterCompletedTodos(); // Call the function to filter completed todos
+  }, [todos, filterCompletedTodos]);
+
+  const [pendingToDos, setPendingToDos] = React.useState([]);
+  const filterpendingData = React.useCallback(() => {
+    const pendingData = todos.filter((item) => item.done === false);
+    setPendingToDos(pendingData);
+  });
+  React.useEffect(() => {
+    filterpendingData();
+  }, [todos, filterpendingData]);
+
   const handleDelete = (id) => {
     deleteToDo(`delete/${id}`).then((res) => {
       setRestart((prev) => !prev);
-      console.log(res);
     });
   };
-  const handleUpdate = (id, task) => {
-    updateToDo(`update/${id}`, task).then((res) => {
-      setRestart((prev) => !prev);
-      // console.log(res);
-    });
-  };
+
   const [open, setOpen] = React.useState(false);
   const [selectedId, setSelectedId] = React.useState();
   const handleOpen = (id) => {
     setSelectedId(id);
-    // console.log(id);
-    // console.log("Open");
     setOpen(true);
   };
   const handleClose = () => {
@@ -90,7 +107,6 @@ export default function BasicTabs() {
   };
   const [text, setText] = React.useState("");
   const handleTextChange = (e) => {
-    // console.log(selectedId);
     const { name, value } = e.target;
     // console.log(value);
     setText(value);
@@ -102,23 +118,26 @@ export default function BasicTabs() {
     updateToDo(`update/${selectedId}`, text)
       .then((res) => {
         setRestart((prev) => !prev);
-        // console.log(res);
       })
       .catch((ex) => console.log("error while updating" + ex));
   };
 
   /* The code snippet you provided is defining a state variable `isChecked` and a function `handleTick`
  to update that state variable. Send as props to CheckBox.jsx*/
-  const [isChecked, setIsChecked] = React.useState(false);
-  console.log(isChecked);
+
   const idStore = (id) => {
     setSelectedId(id);
-    console.log(id);
   };
-  const handleTick = (status) => {
-    completeTask(`done/${selectedId}`, isChecked);
-    setIsChecked(status);
+  const handleCheck = (id, e) => {
+    const { checked } = e.target;
+
+    completeTask(`done/${id}`, checked)
+      .then((res) => {
+        setRestart((prev) => !prev);
+      })
+      .catch((ex) => console.log(ex));
   };
+
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -134,11 +153,74 @@ export default function BasicTabs() {
       </Box>
       <CustomTabPanel value={value} index={0}>
         <table class="table  table-striped">
+          {loading ? (
+            <SkeletonLayout />
+          ) : (
+            <>
+              <thead>
+                <tr>
+                  <th scope="col" className="w-[17%] text-center">
+                    #
+                  </th>
+
+                  <th scope="col" className="text-center">
+                    Name
+                  </th>
+                  <th colSpan="2" scope="col" className="text-center ">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {todos &&
+                  todos.map((item, inbdex) => (
+                    <tr key={inbdex}>
+                      {/* <th scope="row">{inbdex + 1}</th> */}
+                      <td className="">
+                        <div className="text-center">
+                          <label className="checkbox-container">
+                            <input
+                              className="custom-checkbox"
+                              checked={item.done === true ? true : false}
+                              onClick={(e) => handleCheck(item._id, e)}
+                              type="checkbox"
+                            />
+                            <span className="checkmark"></span>
+                          </label>
+                        </div>
+                      </td>
+                      <td
+                        className={`text-center ${
+                          item.done === true ? "line-through" : ""
+                        }`}
+                      >
+                        {item.task}
+                      </td>
+                      <td className="flex justify-center gap-5 ">
+                        <FaRegEdit
+                          onClick={() => handleOpen(item._id)}
+                          className="text-2xl cursor-pointer"
+                        />
+                        <MdOutlineDelete
+                          className="text-2xl cursor-pointer"
+                          onClick={() => handleDelete(item._id)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </>
+          )}
+        </table>
+      </CustomTabPanel>
+      {/* //pending table  */}
+      <CustomTabPanel value={value} index={1}>
+        <table class="table">
           <thead>
             <tr>
               {/* <th scope="col">#</th> */}
               <th scope="col" className="w-[17%]">
-                Completed
+                #
               </th>
 
               <th scope="col" className="text-center">
@@ -150,17 +232,27 @@ export default function BasicTabs() {
             </tr>
           </thead>
           <tbody>
-            {todos &&
-              todos.map((item, inbdex) => (
+            {pendingToDos &&
+              pendingToDos.map((item, inbdex) => (
                 <tr key={inbdex}>
                   {/* <th scope="row">{inbdex + 1}</th> */}
-                  <td className="flex items-center justify-center">
-                    <CheckBox
-                      onClick={() => idStore(item._id)}
-                      key={inbdex}
-                      handleTick={handleTick}
-                      tick={isChecked}
-                    />
+                  <td className="">
+                    <div className="text-center">
+                      <label className="checkbox-container">
+                        <input
+                          className="custom-checkbox"
+                          checked={item.done === true ? true : false}
+                          onClick={(e) => handleCheck(item._id, e)}
+                          type="checkbox"
+                        />
+                        <span className="checkmark"></span>
+                      </label>
+                    </div>
+                    {/* <input
+                          type="checkbox"
+                          checked={item.done === true ? true : false}
+                          onClick={(e) => handleCheck(item._id, e)}
+                        /> */}
                   </td>
                   <td
                     className={`text-center ${
@@ -169,13 +261,13 @@ export default function BasicTabs() {
                   >
                     {item.task}
                   </td>
-                  <td className="flex items-center justify-center gap-5">
+                  <td className="flex justify-center gap-5 ">
                     <FaRegEdit
                       onClick={() => handleOpen(item._id)}
-                      className="text-xl cursor-pointer"
+                      className="text-2xl cursor-pointer"
                     />
                     <MdOutlineDelete
-                      className="text-xl cursor-pointer"
+                      className="text-2xl cursor-pointer"
                       onClick={() => handleDelete(item._id)}
                     />
                   </td>
@@ -184,54 +276,67 @@ export default function BasicTabs() {
           </tbody>
         </table>
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">First</th>
-              <th scope="col">Last</th>
-              <th scope="col">Handle</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-            </tr>
-          </tbody>
-        </table>
-      </CustomTabPanel>
+
+      {/* completed  */}
       <CustomTabPanel value={value} index={2}>
         <table class="table">
           <thead>
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">First</th>
-              <th scope="col">Last</th>
-              <th scope="col">Handle</th>
+              {/* <th scope="col">#</th> */}
+              <th scope="col" className="w-[17%]">
+                #
+              </th>
+
+              <th scope="col" className="text-center">
+                Name
+              </th>
+              <th colSpan="2" scope="col" className="text-center ">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Jacob</td>
-              <td>Thornton</td>
-              <td>@fat</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td colspan="2">Larry the Bird</td>
-              <td>@twitter</td>
-            </tr>
+            {completedTodos &&
+              completedTodos.map((item, inbdex) => (
+                <tr key={inbdex}>
+                  {/* <th scope="row">{inbdex + 1}</th> */}
+                  <td className="">
+                    <div className="text-center">
+                      <label className="checkbox-container">
+                        <input
+                          className="custom-checkbox"
+                          checked={item.done === true ? true : false}
+                          onClick={(e) => handleCheck(item._id, e)}
+                          type="checkbox"
+                        />
+                        <span className="checkmark"></span>
+                      </label>
+                    </div>
+                    {/* <input
+                          type="checkbox"
+                          checked={item.done === true ? true : false}
+                          onClick={(e) => handleCheck(item._id, e)}
+                        /> */}
+                  </td>
+                  <td
+                    className={`text-center ${
+                      item.done === true ? "line-through" : ""
+                    }`}
+                  >
+                    {item.task}
+                  </td>
+                  <td className="flex justify-center gap-5 ">
+                    <FaRegEdit
+                      onClick={() => handleOpen(item._id)}
+                      className="text-2xl cursor-pointer"
+                    />
+                    <MdOutlineDelete
+                      className="text-2xl cursor-pointer"
+                      onClick={() => handleDelete(item._id)}
+                    />
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </CustomTabPanel>
