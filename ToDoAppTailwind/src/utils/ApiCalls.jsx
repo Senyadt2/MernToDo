@@ -2,7 +2,7 @@ import axios from "axios";
 import React from "react";
 
 const ApiCalls = () => {
-  const BaseUrl = "http://localhost:3000/";
+  const BaseUrl = "https://merntodo-k3e3.onrender.com/";
   const fetchToDos = async () => {
     let response = await axios.get(BaseUrl);
     const fetchdata = await response.data;
